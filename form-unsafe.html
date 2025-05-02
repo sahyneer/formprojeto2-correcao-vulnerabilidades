@@ -7,7 +7,7 @@
 </head>
 <body>
     <h2>Cadastro</h2>
-    <form action="result-form.csv" method="post">
+    <form id="cadastro">
         <label for="nome">Nome:</label>
         <input type="text" id="nome" name="nome">
         <br><br>
@@ -16,5 +16,31 @@
         <br><br>
         <button type="submit">Enviar</button>
     </form>
+    <script>
+        document.getElementById("cadastro").addEventListener("submit", function(event) {
+            event.preventDefault(); // Impede o envio tradicional do formulário
+            
+            let nome = document.getElementById("nome").value;
+            let telefone = document.getElementById("telefone").value;
+            
+            let dados = localStorage.getItem("csvData") ? JSON.parse(localStorage.getItem("csvData")) : [];
+            dados.push([nome, telefone]); // Adiciona novo registro
+            
+            // Salva os dados atualizados no localStorage
+            localStorage.setItem("csvData", JSON.stringify(dados));
+
+            // Prepara o conteúdo do CSV com todos os registros
+            let csvContent = "data:text/csv;charset=utf-8,Nome,Telefone\n" + 
+                             dados.map(e => e.join(",")).join("\n");
+
+            // Cria um link para baixar o arquivo
+            let encodedUri = encodeURI(csvContent);
+            let link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "result-form.csv");
+            document.body.appendChild(link);
+            link.click();
+        });
+    </script>
 </body>
 </html>
