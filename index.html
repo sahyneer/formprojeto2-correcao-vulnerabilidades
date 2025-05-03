@@ -24,16 +24,16 @@
     </form>
 
     <script>
-        document.getElementById("cadastroForm").addEventListener("submit", function(event) {
+        document.getElementById("cadastro").addEventListener("submit", function(event) {
             event.preventDefault();
 
             let nome = document.getElementById("nome").value;
             let email = document.getElementById("email").value;
             let telefone = document.getElementById("telefone").value;
 
-            let dados = localStorage.getItem("cadastros") ? JSON.parse(localStorage.getItem("cadastros")) : [];
+            let dados = localStorage.getItem("cadastro_local") ? JSON.parse(localStorage.getItem("cadastro_local")) : [];
             dados.push({ nome, email, telefone }); // Adiciona novo registro
-            localStorage.setItem("cadastros", JSON.stringify(dados)); 
+            localStorage.setItem("cadastro_local", JSON.stringify(dados)); 
 
             let novaPagina = `
                 <!DOCTYPE html>
