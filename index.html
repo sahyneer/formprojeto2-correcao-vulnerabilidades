@@ -4,38 +4,55 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Acme Corporation</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+    </style>
 </head>
 <body>
-    <h2>Cadastro</h2>
+    <h2>Formulario Seguro (ou não)</h2>
     <form id="cadastro">
         <label for="nome">Nome:</label>
-        <input type="text" id="nome" name="nome">
+        <input id="nome" name="nome">
+        <br><br>
+        <label for="email">E-mail:</label>
+        <input id="email" name="email">
         <br><br>
         <label for="telefone">Telefone:</label>
-        <input type="text" id="telefone" name="telefone">
+        <input id="telefone" name="telefone">
         <br><br>
-        <button type="submit">Enviar</button>
+        <button type="submit">Salvar!</button>
     </form>
+
     <script>
         document.getElementById("cadastro").addEventListener("submit", function(event) {
-                       
+            event.preventDefault();
+
             let nome = document.getElementById("nome").value;
+            let email = document.getElementById("email").value;
             let telefone = document.getElementById("telefone").value;
-            
-            let dados = localStorage.getItem("csvData") ? JSON.parse(localStorage.getItem("csvData")) : [];
-            dados.push([nome, telefone]); // Adiciona novo registro
-            
-            localStorage.setItem("csvData", JSON.stringify(dados));
 
-            let csvContent = "data:text/csv;charset=utf-8,Nome,Telefone\n" + 
-                             dados.map(e => e.join(",")).join("\n");
+            // Criando uma nova página HTML com os dados inseridos
+            let novaPagina = `
+                <!DOCTYPE html>
+                <html lang="pt">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Dados Cadastrados</title>
+                    <style> body { font-family: Arial, sans-serif; padding: 20px; } </style>
+                </head>
+                <body>
+                    <h2>Dados Cadastrados</h2>
+                    <p><strong>Nome:</strong> ${nome}</p>
+                    <p><strong>E-mail:</strong> ${email}</p>
+                    <p><strong>Telefone:</strong> ${telefone}</p>
+                </body>
+                </html>
+            `;
 
-            let encodedUri = encodeURI(csvContent);
-            let link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", "result-form.csv");
-            document.body.appendChild(link);
-            link.click();
+            let novaAba = window.open();
+            novaAba.document.write(novaPagina);
+            novaAba.document.close();
         });
     </script>
 </body>
