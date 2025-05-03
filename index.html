@@ -24,14 +24,17 @@
     </form>
 
     <script>
-        document.getElementById("cadastro").addEventListener("submit", function(event) {
+        document.getElementById("cadastroForm").addEventListener("submit", function(event) {
             event.preventDefault();
 
             let nome = document.getElementById("nome").value;
             let email = document.getElementById("email").value;
             let telefone = document.getElementById("telefone").value;
 
-            // Criando uma nova página HTML com os dados inseridos
+            let dados = localStorage.getItem("cadastros") ? JSON.parse(localStorage.getItem("cadastros")) : [];
+            dados.push({ nome, email, telefone }); // Adiciona novo registro
+            localStorage.setItem("cadastros", JSON.stringify(dados)); 
+
             let novaPagina = `
                 <!DOCTYPE html>
                 <html lang="pt">
@@ -39,13 +42,26 @@
                     <meta charset="UTF-8">
                     <meta name="viewport" content="width=device-width, initial-scale=1.0">
                     <title>Dados Cadastrados</title>
-                    <style> body { font-family: Arial, sans-serif; padding: 20px; } </style>
+                    <style> 
+                        body { font-family: Arial, sans-serif; padding: 20px; } 
+                        table { width: 100%; border-collapse: collapse; }
+                        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                    </style>
                 </head>
                 <body>
                     <h2>Dados Cadastrados</h2>
-                    <p><strong>Nome:</strong> ${nome}</p>
-                    <p><strong>E-mail:</strong> ${email}</p>
-                    <p><strong>Telefone:</strong> ${telefone}</p>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>E-mail</th>
+                                <th>Telefone</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${dados.map(d => `<tr><td>${d.nome}</td><td>${d.email}</td><td>${d.telefone}</td></tr>`).join("")}
+                        </tbody>
+                    </table>
                 </body>
                 </html>
             `;
