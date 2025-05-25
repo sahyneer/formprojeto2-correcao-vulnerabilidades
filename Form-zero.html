@@ -9,33 +9,94 @@
     </style>
 </head>
 <body>
-    <h2>Formulario Seguro (ou não)</h2>
+    <h2>Formulario Seguro (ou não)</h2> 
     <form id="cadastro">
+        <!--
+            1º Vulnerabilidade -> Falta de Validação de Input
+
+            É necessário estabelecer uma prática de validação dos dados por parte do usuário,
+            visto que o mesmo garante que os dados sejam passados de forma correta e evita a
+            injeção de código malicioso na aplicação em questão.
+
+            SOLUÇÃO
+
+            Uso de atributos para validação no HTML: 
+            - required: impede o envio vazio 
+            - type: verifica se está no formato válido
+            - pattern: delimita valores mínimos e máximos
+
+            Criação de uma lógica/funcao para evitar o envio de código através da 
+            troca de símbolos para seus formatos HTML.
+        -->
+
         <label for="nome">Nome:</label>
-        <input id="nome" name="nome">
+        <input id="nome" name="nome" required>
         <br><br>
         <label for="email">E-mail:</label>
-        <input id="email" name="email">
+        <input id="email" name="email" type="email" required>
         <br><br>
         <label for="telefone">Telefone:</label>
-        <input id="telefone" name="telefone">
+        <input id="telefone" name="telefone" type="tel" pattern="^\d{10,11}$" required>
         <br><br>
         <button type="submit">Salvar!</button>
     </form>
 
     <script>
+        function validacaoEntrada(str) { // troca os símbolos para seu formato HTML
+            return str.replace(/[&<>"']/g, m => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            }[m]));
+        }
+
+        /*
+            2º Vulnerabilidade -> Transmissão de dados sem camuflagem
+
+            Os dados coletados não possuem nenhuma proteção contra exposição e podem ser facilmente vazados.
+
+            SOLUÇÃO:
+
+            A melhor recomendação para proteger esses dados é o uso de criptografia, nesse caso está sendo 
+            usado a codificação em Base64. A mesma em si não protege contra a vulnerabilidade mas pode amenizar o problema
+            visto que os dados não estarão totalmente expostos.
+        */
+
+        function encodeBase64(str) { // Codifica os dados para Base64
+            return btoa(unescape(encodeURIComponent(str)));
+        }
+
         document.getElementById("cadastro").addEventListener("submit", function(event) {
             event.preventDefault();
 
-            let nome = document.getElementById("nome").value;
-            let email = document.getElementById("email").value;
-            let telefone = document.getElementById("telefone").value;
+            //Dados codificados em Base64 e verificados para serem coletados
+            let nome = encodeBase64(validacaoEntrada(document.getElementById("nome").value));
+            let email = encodeBase64(validacaoEntrada(document.getElementById("email").value));
+            let telefone = encodeBase64(validacaoEntrada(document.getElementById("telefone").value));
+
 
             let dados = localStorage.getItem("cadastro_local") ? JSON.parse(localStorage.getItem("cadastro_local")) : [];
             dados.push({ nome, email, telefone }); 
             localStorage.setItem("cadastro_local", JSON.stringify(dados)); 
 
-            let novaPagina = `
+            alert("Dados salvos com sucesso!"); // confirmação sobre os dados salvos (Sugestão)
+
+            /*
+                3º Vulnerabilidade -> Exposição de Dados Pessoais
+
+                Após o envio dos dados aparece uma página criada propositalmente para exibir os dados cadastrados
+                no formulário, em uma situação de dados sensíveis como senhas de acesso e cpf pode ser um risco muito grande
+                caso caia em mãos erradas. 
+
+                SOLUÇÃO:
+
+                Retirar parte do código que cria e exibe esses dados
+
+                CÓDIGO VULNERÁVEL:
+
+                let novaPagina = `
                 <!DOCTYPE html>
                 <html lang="pt">
                 <head>
@@ -69,6 +130,7 @@
             let novaAba = window.open();
             novaAba.document.write(novaPagina);
             novaAba.document.close();
+            */
         });
     </script>
 </body>
